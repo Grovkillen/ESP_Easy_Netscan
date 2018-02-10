@@ -5,7 +5,7 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.006
+Let>VERSION=0.00.007
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 
 //Start of program
@@ -203,7 +203,10 @@ SRT>FETCH_INFO_ABOUT_UNITS
   Separate>FOUND_ESPRESSIF_UNITS,%CRLF%,FOUND_ESPRESSIF_UNITS_IP_ARRAY
   If>FOUND_ESPRESSIF_UNITS_IP_ARRAY_count=0
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
-    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,No ESP Easy units found in ARP table, please run "Deep scan".
+    If>DEEP_SCAN=1
+      Let>EXTRA_TEXT=, please run "Deep scan"
+    Endif>
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,No ESP Easy units found in ARP table%EXTRA_TEXT%.
     Wait>5
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
   Else>
