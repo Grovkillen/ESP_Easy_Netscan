@@ -5,7 +5,7 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.003
+Let>VERSION=0.00.004
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 
 //Start of program
@@ -17,7 +17,7 @@ GoSub>ADD_DIALOG_HANDLERS
 GoSub>DO_A_SCAN,0,0,0
 Show>Dialog_MAIN
 
-//Loop to let dialog1 stay alive and listen to interactions from user
+//Loop to let dialog_MAIN stay alive and listen to interactions from user
 Label>WAITING_FOR_A_WHILE
 Let>WAIT_FOR_CROWS=0.02
 Wait>%WAIT_FOR_CROWS%
@@ -124,11 +124,6 @@ END>EXIT_APP
 
 //Add dialog handlers...
 SRT>ADD_DIALOG_HANDLERS
-  IfDirExists>%SCRIPT_DIR%\APP_DATA
-    //Do nothing
-  Else>
-    CreateDir>%SCRIPT_DIR%\APP_DATA
-  Endif>
   SetDialogProperty>Dialog_MAIN,,Caption,APP_TITLE
   SetDialogProperty>Dialog_MAIN,ProgressBar,Position,0
   SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
@@ -349,6 +344,14 @@ SRT>GET_LOCAL_IP
 Let>RP_WAIT=1
 Let>RP_WINDOWMODE=0
 Let>RP_DISPLAYERROR=0
+IfDirExists>%SCRIPT_DIR%\APP_DATA
+  //Do nothing
+Else>
+  CreateDir>%SCRIPT_DIR%\APP_DATA
+Endif>
+IfFileExists>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt
+  DeleteFile>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt
+Endif>
 RunProgram>cmd /c ipconfig | Find "IPv4 Address" > CreateDir>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt
 ReadFile>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt,FILE_CONTENT
 RegEx>[IPAddress],FILE_CONTENT,1,FOUND_IP,,0,,
