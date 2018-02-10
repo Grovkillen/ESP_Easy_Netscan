@@ -5,7 +5,7 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.005
+Let>VERSION=0.00.006
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 
 //Start of program
@@ -201,61 +201,68 @@ END>PING_ESPRESSIF_IPS
 
 SRT>FETCH_INFO_ABOUT_UNITS
   Separate>FOUND_ESPRESSIF_UNITS,%CRLF%,FOUND_ESPRESSIF_UNITS_IP_ARRAY
-  Let>k_csv=0
-  Repeat>k_csv
-    Let>k_csv=k_csv+1
-    Let>CURRENT_IP=FOUND_ESPRESSIF_UNITS_IP_ARRAY_%k_csv%
-    Let>PROGRESS_POSITION={round(100*%k_csv%/%FOUND_ESPRESSIF_UNITS_IP_ARRAY_count%)}
-    SetDialogProperty>Dialog_MAIN,ProgressBar,Position,%PROGRESS_POSITION%
-    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,Getting info from %CURRENT_IP% (%k_csv%/%FOUND_ESPRESSIF_UNITS_IP_ARRAY_count%)
+  If>FOUND_ESPRESSIF_UNITS_IP_ARRAY_count=0
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
-    Let>HTTP_TIMEOUT=5
-    Timer>TIMER1
-    HTTPRequest>http://%CURRENT_IP%/json,,GET,,JSON_STRING,,,,
-    Timer>TIMER2
-    Let>TIME_DIFF=TIMER2-TIMER1
-    If>JSON_STRING=404 HTTP/1.1 404 Not Found
-      //
-      Let>BUILD_NUMBER_%k_csv%=?
-      Let>GIT_BUILD_NUMBER_%k_csv%=?
-      Let>UNIT_NUMBER_%k_csv%=?
-      Let>UNIT_NAME_%k_csv%=?
-      Let>UNIT_ONLINE_%k_csv%="Offline"
-    Else>
-      JSONParse>JSON_STRING,System.Build,TEMP_STRING
-      If>TEMP_STRING=
-        Let>TEMP_STRING=?
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,No ESP Easy units found in ARP table, please run "Deep scan".
+    Wait>5
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
+  Else>
+    Let>k_csv=0
+    Repeat>k_csv
+      Let>k_csv=k_csv+1
+      Let>CURRENT_IP=FOUND_ESPRESSIF_UNITS_IP_ARRAY_%k_csv%
+      Let>PROGRESS_POSITION={round(100*%k_csv%/%FOUND_ESPRESSIF_UNITS_IP_ARRAY_count%)}
+      SetDialogProperty>Dialog_MAIN,ProgressBar,Position,%PROGRESS_POSITION%
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,Getting info from %CURRENT_IP% (%k_csv%/%FOUND_ESPRESSIF_UNITS_IP_ARRAY_count%)
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
+      Let>HTTP_TIMEOUT=5
+      Timer>TIMER1
+      HTTPRequest>http://%CURRENT_IP%/json,,GET,,JSON_STRING,,,,
+      Timer>TIMER2
+      Let>TIME_DIFF=TIMER2-TIMER1
+      If>JSON_STRING=404 HTTP/1.1 404 Not Found
+        //
+        Let>BUILD_NUMBER_%k_csv%=?
+        Let>GIT_BUILD_NUMBER_%k_csv%=?
+        Let>UNIT_NUMBER_%k_csv%=?
+        Let>UNIT_NAME_%k_csv%=?
+        Let>UNIT_ONLINE_%k_csv%="Offline"
+      Else>
+        JSONParse>JSON_STRING,System.Build,TEMP_STRING
+        If>TEMP_STRING=
+          Let>TEMP_STRING=?
+        Endif>
+        Let>BUILD_NUMBER_%k_csv%=TEMP_STRING
+        JSONParse>JSON_STRING,System.Unit,TEMP_STRING
+        If>TEMP_STRING=
+          Let>TEMP_STRING=?
+        Endif>
+        Let>UNIT_NUMBER_%k_csv%=TEMP_STRING
+        JSONParse>JSON_STRING,System.Name,TEMP_STRING
+        If>TEMP_STRING=
+          Let>TEMP_STRING=?
+        Endif>
+        Let>UNIT_NAME_%k_csv%=TEMP_STRING
+        JSONParse>JSON_STRING,System.Git Build,TEMP_STRING
+        If>TEMP_STRING=
+          Let>TEMP_STRING=?
+        Endif>
+        Let>GIT_BUILD_NUMBER_%k_csv%=TEMP_STRING
+        Let>UNIT_ONLINE_%k_csv%="Online"
       Endif>
-      Let>BUILD_NUMBER_%k_csv%=TEMP_STRING
-      JSONParse>JSON_STRING,System.Unit,TEMP_STRING
-      If>TEMP_STRING=
-        Let>TEMP_STRING=?
+      If>TIME_DIFF>5000
+        Let>UNIT_ONLINE_%k_csv%="Timed out"
       Endif>
-      Let>UNIT_NUMBER_%k_csv%=TEMP_STRING
-      JSONParse>JSON_STRING,System.Name,TEMP_STRING
-      If>TEMP_STRING=
-        Let>TEMP_STRING=?
-      Endif>
-      Let>UNIT_NAME_%k_csv%=TEMP_STRING
-      JSONParse>JSON_STRING,System.Git Build,TEMP_STRING
-      If>TEMP_STRING=
-        Let>TEMP_STRING=?
-      Endif>
-      Let>GIT_BUILD_NUMBER_%k_csv%=TEMP_STRING
-      Let>UNIT_ONLINE_%k_csv%="Online"
-    Endif>
-    If>TIME_DIFF>5000
-      Let>UNIT_ONLINE_%k_csv%="Timed out"
-    Endif>
-    Let>TEMP_NAME=UNIT_NAME_%k_csv%
-    Let>TEMP_NUMBER=UNIT_NUMBER_%k_csv%
-    Let>TEMP_BUILD=BUILD_NUMBER_%k_csv%
-    Let>TEMP_GIT=GIT_BUILD_NUMBER_%k_csv%
-    Let>TEMP_ONLINE=UNIT_ONLINE_%k_csv%
-    Let>TEMP_ROW_INFO_%k_csv%=,%TEMP_NAME%,%TEMP_NUMBER%,%TEMP_BUILD%,%TEMP_GIT%,%TEMP_ONLINE%
-  Until>k_csv=FOUND_ESPRESSIF_UNITS_IP_ARRAY_count
-  SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
-  SetDialogProperty>Dialog_MAIN,ProgressBar,Position,0
+      Let>TEMP_NAME=UNIT_NAME_%k_csv%
+      Let>TEMP_NUMBER=UNIT_NUMBER_%k_csv%
+      Let>TEMP_BUILD=BUILD_NUMBER_%k_csv%
+      Let>TEMP_GIT=GIT_BUILD_NUMBER_%k_csv%
+      Let>TEMP_ONLINE=UNIT_ONLINE_%k_csv%
+      Let>TEMP_ROW_INFO_%k_csv%=,%TEMP_NAME%,%TEMP_NUMBER%,%TEMP_BUILD%,%TEMP_GIT%,%TEMP_ONLINE%
+    Until>k_csv=FOUND_ESPRESSIF_UNITS_IP_ARRAY_count
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
+    SetDialogProperty>Dialog_MAIN,ProgressBar,Position,0
+  Endif>
 END>FETCH_INFO_ABOUT_UNITS
 
 SRT>GET_THE_MAC
