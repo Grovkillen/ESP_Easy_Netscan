@@ -1,7 +1,7 @@
 ESP Easy Netscan
 ------------
 
-![ESP Easy Netscan GUI](Screenshot.png)
+![ESP Easy Netscan GUI](Screenshot.PNG)
 
 INTRO
 ------------
