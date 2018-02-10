@@ -5,7 +5,7 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.002
+Let>VERSION=0.00.003
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 
 //Start of program
@@ -89,7 +89,7 @@ object Dialog_MAIN: TForm
       Top = 6
       Width = 75
       Height = 25
-      Caption = 'Scan'
+      Caption = 'Fetch info'
       TabOrder = 0
       DoBrowse = False
       BrowseStyle = fbOpen
@@ -101,16 +101,6 @@ object Dialog_MAIN: TForm
       Height = 25
       Caption = 'Deep scan'
       TabOrder = 1
-      DoBrowse = False
-      BrowseStyle = fbOpen
-    end
-    object Button_Update_Info: tMSButton
-      Left = 168
-      Top = 6
-      Width = 75
-      Height = 25
-      Caption = 'Update info'
-      TabOrder = 2
       DoBrowse = False
       BrowseStyle = fbOpen
     end
@@ -144,14 +134,12 @@ SRT>ADD_DIALOG_HANDLERS
   SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
   AddDialogHandler>Dialog_MAIN,,OnClose,EXIT_APP
   AddDialogHandler>Dialog_MAIN,Button_Deep_Scan,OnClick,DO_A_SCAN(1,1,1)
-  AddDialogHandler>Dialog_MAIN,Button_Scan,OnClick,DO_A_SCAN(0,0,0)
-  AddDialogHandler>Dialog_MAIN,Button_Update_Info,OnClick,DO_A_SCAN(0,0,1)
+  AddDialogHandler>Dialog_MAIN,Button_Scan,OnClick,DO_A_SCAN(0,0,1)
 END>ADD_DIALOG_HANDLERS
 
 SRT>DO_A_SCAN
   SetDialogProperty>Dialog_MAIN,Button_Deep_Scan,Enabled,False
   SetDialogProperty>Dialog_MAIN,Button_Scan,Enabled,False
-  SetDialogProperty>Dialog_MAIN,Button_Update_Info,Enabled,False
   Let>SUM_OF_ALL_INPUTS={%DO_A_SCAN_Var_1%+%DO_A_SCAN_Var_2%+%DO_A_SCAN_Var_3%}
   Let>DEEP_SCAN=DO_A_SCAN_Var_1
   Let>PING_SCAN=DO_A_SCAN_Var_2
@@ -173,7 +161,6 @@ SRT>DO_A_SCAN
   SetDialogProperty>Dialog_MAIN,THE_GRID,LoadFromCSV,THE_GRID_CSV
   SetDialogProperty>Dialog_MAIN,Button_Deep_Scan,Enabled,True
   SetDialogProperty>Dialog_MAIN,Button_Scan,Enabled,True
-  SetDialogProperty>Dialog_MAIN,Button_Update_Info,Enabled,True
 END>DO_A_SCAN
 
 SRT>GET_THE_IP_OCTETS
