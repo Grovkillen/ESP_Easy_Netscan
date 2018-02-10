@@ -5,14 +5,14 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.007
+Let>VERSION=0.00.008
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 
 //Start of program
 GoSub>DIALOG_MAIN
 GoSub>GET_LOCAL_IP
-GoSub>CONCAT_THE_MAC
 GoSub>GET_THE_IP_OCTETS
+GoSub>CONCAT_THE_MAC
 GoSub>ADD_DIALOG_HANDLERS
 GoSub>DO_A_SCAN,0,0,0
 Show>Dialog_MAIN
@@ -282,8 +282,8 @@ SRT>GET_THE_MAC
   Endif>
   Let>REGEX_PATTERN=%IP_OCTETS_1%\.%IP_OCTETS_2%\.%IP_OCTETS_3%\..[0123456789]{0,2} {0,}.{2}-.{2}-.{2}-.{2}-.{2}-.{2}
   RegEx>REGEX_PATTERN,FILE_CONTENT,,FOUND_MAC_ADDRESSES,FOUND_MAC_ADDRESSES_num,,,
+  Let>FOUND_ESPRESSIF_UNITS=
   If>FOUND_MAC_ADDRESSES_num>0
-    Let>FOUND_ESPRESSIF_UNITS=
     Let>k_espressif=0
     Repeat>k_espressif
       Let>k_espressif=k_espressif+1
@@ -330,30 +330,34 @@ SRT>THE_CSV_TO_THE_DIALOG
   Let>NUMBER_OF_COLUMNS=NUMBER_OF_COLUMNS+1
   SetDialogProperty>Dialog_MAIN,THE_GRID,ColCount,%NUMBER_OF_COLUMNS%
   Separate>FOUND_ESPRESSIF_UNITS,%CRLF%,FOUND_ESPRESSIF_UNITS_IP_ARRAY
-  Let>k_csv=0
-  Repeat>k_csv
-    Let>k_csv=k_csv+1
-    Let>TEMP_ROW=FOUND_ESPRESSIF_UNITS_IP_ARRAY_%k_csv%
-    If>k_csv=FOUND_ESPRESSIF_UNITS_IP_ARRAY_count
-      Let>THE_GRID_CSV=%THE_GRID_CSV%%TEMP_ROW%
-    Else>
-      Let>THE_GRID_CSV=%THE_GRID_CSV%%CRLF%
-      Let>THE_GRID_CSV=%THE_GRID_CSV%%TEMP_ROW%
-    Endif>
-    Assigned>TEMP_ROW_INFO_%k_csv%,IS_IT_ASSIGNED
-    If>IS_IT_ASSIGNED=FALSE
-      Let>TEMP_STRING=
-    Else>
-      Let>TEMP_STRING=TEMP_ROW_INFO_%k_csv%
-    Endif>
-    ConCat>THE_GRID_CSV,TEMP_STRING
-  Until>k_csv=FOUND_ESPRESSIF_UNITS_IP_ARRAY_count
+  If>FOUND_ESPRESSIF_UNITS_IP_ARRAY_count>0
+    Let>k_csv=0
+    Repeat>k_csv
+      Let>k_csv=k_csv+1
+      Let>TEMP_ROW=FOUND_ESPRESSIF_UNITS_IP_ARRAY_%k_csv%
+      If>k_csv=FOUND_ESPRESSIF_UNITS_IP_ARRAY_count
+        Let>THE_GRID_CSV=%THE_GRID_CSV%%TEMP_ROW%
+      Else>
+        Let>THE_GRID_CSV=%THE_GRID_CSV%%CRLF%
+        Let>THE_GRID_CSV=%THE_GRID_CSV%%TEMP_ROW%
+      Endif>
+      Assigned>TEMP_ROW_INFO_%k_csv%,IS_IT_ASSIGNED
+      If>IS_IT_ASSIGNED=FALSE
+        Let>TEMP_STRING=
+      Else>
+        Let>TEMP_STRING=TEMP_ROW_INFO_%k_csv%
+      Endif>
+      ConCat>THE_GRID_CSV,TEMP_STRING
+    Until>k_csv=FOUND_ESPRESSIF_UNITS_IP_ARRAY_count
+  Else>
+    Let>INFO_SCAN=1
+    Let>DEEP_SCAN=1
+  Endif>
 END>THE_CSV_TO_THE_DIALOG
 
 SRT>GET_LOCAL_IP
 Let>RP_WAIT=1
 Let>RP_WINDOWMODE=0
-Let>RP_DISPLAYERROR=0
 IfDirExists>%SCRIPT_DIR%\APP_DATA
   //Do nothing
 Else>
@@ -364,9 +368,11 @@ IfFileExists>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt
 Endif>
 RunProgram>cmd /c ipconfig | Find "IPv4 Address" > CreateDir>"%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt"
 ReadFile>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt,FILE_CONTENT
-RegEx>[IPAddress],FILE_CONTENT,1,FOUND_IP,,0,,
+RegEx>[IPAddress],FILE_CONTENT,1,FOUND_IP,,,,
 Let>ACTIVE_IP_ADDRESS=FOUND_IP_1
-DeleteFile>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt
+IfFileExists>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt
+  DeleteFile>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt
+Endif>
 Let>RP_WAIT=0
 END>GET_LOCAL_IP
 
