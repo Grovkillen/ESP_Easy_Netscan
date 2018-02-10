@@ -5,7 +5,7 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.004
+Let>VERSION=0.00.005
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 
 //Start of program
@@ -352,7 +352,7 @@ Endif>
 IfFileExists>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt
   DeleteFile>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt
 Endif>
-RunProgram>cmd /c ipconfig | Find "IPv4 Address" > CreateDir>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt
+RunProgram>cmd /c ipconfig | Find "IPv4 Address" > CreateDir>"%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt"
 ReadFile>%SCRIPT_DIR%\APP_DATA\LOCAL_IP.txt,FILE_CONTENT
 RegEx>[IPAddress],FILE_CONTENT,1,FOUND_IP,,0,,
 Let>ACTIVE_IP_ADDRESS=FOUND_IP_1
