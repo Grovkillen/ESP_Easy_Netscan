@@ -5,7 +5,7 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.010
+Let>VERSION=0.00.011
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 
 //Start of program
@@ -16,6 +16,8 @@ GoSub>CONCAT_THE_MAC
 GoSub>ADD_DIALOG_HANDLERS
 GoSub>DO_A_SCAN,0,0,0
 Show>Dialog_MAIN
+Wait>%TIME_TO_DISPLAY_MESSAGE%
+SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
 
 //Loop to let dialog_MAIN stay alive and listen to interactions from user
 Label>WAITING_FOR_A_WHILE
@@ -156,15 +158,14 @@ SRT>DO_A_SCAN
   SetDialogProperty>Dialog_MAIN,THE_GRID,LoadFromCSV,THE_GRID_CSV
   SetDialogProperty>Dialog_MAIN,Button_Deep_Scan,Enabled,True
   SetDialogProperty>Dialog_MAIN,Button_Scan,Enabled,True
-  RegEx>[IPAddress],FILE_CONTENT,1,,FOUND_IN_ARP,,,
+  RegEx>[IPAddress],THE_GRID_CSV,1,,FOUND_IN_ARP,,,
   If>FOUND_IN_ARP>0
     //YES, we found something
   Else>
     Let>EXTRA_TEXT=, please run "Deep scan"
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,No ESP Easy units found in ARP table%EXTRA_TEXT%.
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
-    Wait>5
-    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
+    Let>TIME_TO_DISPLAY_MESSAGE=5
   Endif>
 END>DO_A_SCAN
 
