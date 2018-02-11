@@ -5,7 +5,7 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.011
+Let>VERSION=0.00.012
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 
 //Start of program
@@ -147,6 +147,7 @@ SRT>DO_A_SCAN
   If>DEEP_SCAN>0
     GoSub>PING_THE_NETWORK
     Let>SUM_OF_ALL_INPUTS=0
+    Let>INFO_SCAN=1
   Endif>
   If>SUM_OF_ALL_INPUTS=0
     GoSub>GET_THE_MAC
@@ -218,18 +219,16 @@ SRT>FETCH_INFO_ABOUT_UNITS
       Let>EXTRA_TEXT=, please run "Deep scan"
     Endif>
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,No ESP Easy units found in ARP table%EXTRA_TEXT%.
-    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
-    Wait>5
-    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
   Else>
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
+    Let>TOTAL_COUNT=FOUND_ESPRESSIF_UNITS_IP_ARRAY_count-1
     Let>k_csv=0
     Repeat>k_csv
       Let>k_csv=k_csv+1
       Let>CURRENT_IP=FOUND_ESPRESSIF_UNITS_IP_ARRAY_%k_csv%
-      Let>PROGRESS_POSITION={round(100*%k_csv%/%FOUND_ESPRESSIF_UNITS_IP_ARRAY_count%)}
+      Let>PROGRESS_POSITION={round(100*%k_csv%/%TOTAL_COUNT%)}
       SetDialogProperty>Dialog_MAIN,ProgressBar,Position,%PROGRESS_POSITION%
-      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,Getting info from %CURRENT_IP% (%k_csv%/%FOUND_ESPRESSIF_UNITS_IP_ARRAY_count%)
-      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,Getting info from %CURRENT_IP% (%k_csv%/%TOTAL_COUNT%)
       Let>HTTP_TIMEOUT=5
       Timer>TIMER1
       HTTPRequest>http://%CURRENT_IP%/json,,GET,,JSON_STRING,,,,
@@ -274,7 +273,7 @@ SRT>FETCH_INFO_ABOUT_UNITS
       Let>TEMP_GIT=GIT_BUILD_NUMBER_%k_csv%
       Let>TEMP_ONLINE=UNIT_ONLINE_%k_csv%
       Let>TEMP_ROW_INFO_%k_csv%=,%TEMP_NAME%,%TEMP_NUMBER%,%TEMP_BUILD%,%TEMP_GIT%,%TEMP_ONLINE%
-    Until>k_csv=FOUND_ESPRESSIF_UNITS_IP_ARRAY_count
+    Until>k_csv=TOTAL_COUNT
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
     SetDialogProperty>Dialog_MAIN,ProgressBar,Position,0
   Endif>
