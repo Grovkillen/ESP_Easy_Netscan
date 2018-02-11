@@ -5,7 +5,7 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.009
+Let>VERSION=0.00.010
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 
 //Start of program
@@ -156,6 +156,16 @@ SRT>DO_A_SCAN
   SetDialogProperty>Dialog_MAIN,THE_GRID,LoadFromCSV,THE_GRID_CSV
   SetDialogProperty>Dialog_MAIN,Button_Deep_Scan,Enabled,True
   SetDialogProperty>Dialog_MAIN,Button_Scan,Enabled,True
+  RegEx>[IPAddress],FILE_CONTENT,1,,FOUND_IN_ARP,,,
+  If>FOUND_IN_ARP>0
+    //YES, we found something
+  Else>
+    Let>EXTRA_TEXT=, please run "Deep scan"
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,No ESP Easy units found in ARP table%EXTRA_TEXT%.
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
+    Wait>5
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
+  Endif>
 END>DO_A_SCAN
 
 SRT>GET_THE_IP_OCTETS
@@ -302,11 +312,7 @@ SRT>GET_THE_MAC
       Endif>
     Until>k_espressif=FOUND_MAC_ADDRESSES_num
   Else>
-    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,No ESP Easy units found in ARP table, please run "Deep scan".
-    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
-    Show>Dialog_MAIN
-    Wait>5
-    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
+    //NOTHING FOUND IN ARP...
   Endif>
 END>GET_THE_MAC
 
