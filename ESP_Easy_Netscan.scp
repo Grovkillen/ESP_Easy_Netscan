@@ -5,7 +5,7 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.008
+Let>VERSION=0.00.009
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 
 //Start of program
@@ -202,11 +202,12 @@ END>PING_ESPRESSIF_IPS
 SRT>FETCH_INFO_ABOUT_UNITS
   Separate>FOUND_ESPRESSIF_UNITS,%CRLF%,FOUND_ESPRESSIF_UNITS_IP_ARRAY
   If>FOUND_ESPRESSIF_UNITS_IP_ARRAY_count=0
-    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
+    Let>EXTRA_TEXT=
     If>DEEP_SCAN=1
       Let>EXTRA_TEXT=, please run "Deep scan"
     Endif>
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,No ESP Easy units found in ARP table%EXTRA_TEXT%.
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
     Wait>5
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
   Else>
@@ -300,6 +301,12 @@ SRT>GET_THE_MAC
         Let>FOUND_ESPRESSIF_UNITS=%FOUND_ESPRESSIF_UNITS%%CURRENT_IP_NUMBER%%CRLF%
       Endif>
     Until>k_espressif=FOUND_MAC_ADDRESSES_num
+  Else>
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,No ESP Easy units found in ARP table, please run "Deep scan".
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
+    Show>Dialog_MAIN
+    Wait>5
+    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
   Endif>
 END>GET_THE_MAC
 
