@@ -5,8 +5,9 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.012
+Let>VERSION=0.00.013
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
+Let>MAX_PARALLEL_PINGS=10
 
 //Start of program
 GoSub>DIALOG_MAIN
@@ -180,7 +181,9 @@ SRT>PING_THE_NETWORK
     Let>RP_WAIT=0
     Let>IP_OCTETS_4=0
     Let>IP_OCTETS_4_max=254
+    Let>k_ping=0
     Repeat>IP_OCTETS_4
+      Let>k_ping=k_ping+1
       Let>IP_OCTETS_4=IP_OCTETS_4+1
       Let>IP_NUMBER=%ACTIVE_SUB_NET%.%IP_OCTETS_4%
       Let>PROGRESS_POSITION={round(100*%IP_OCTETS_4%/%IP_OCTETS_4_max%)}
@@ -200,7 +203,17 @@ SRT>PING_THE_NETWORK
         Let>DEBUG_OUTPUT=
       Endif>
       Let>RUN_STRING=powershell "test-connection -ComputerName %IP_NUMBER% -count 1 -ErrorAction SilentlyContinue | Format-List%DEBUG_OUTPUT%"
-      RunProgram>%RUN_STRING%
+      If>IP_OCTETS_4=IP_OCTETS_4_max
+        Let>k_ping=MAX_PARALLEL_PINGS
+      Endif>
+      If>k_ping=MAX_PARALLEL_PINGS
+        Let>RP_WAIT=1
+        RunProgram>%RUN_STRING%
+        Let>RP_WAIT=0
+        Let>k_ping=0
+      Else>
+        RunProgram>%RUN_STRING%
+      Endif>
     Until>IP_OCTETS_4=IP_OCTETS_4_max
     Let>RP_WAIT=1
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
