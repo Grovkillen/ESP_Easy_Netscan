@@ -5,7 +5,7 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.014
+Let>VERSION=0.00.015
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 Let>MAX_PARALLEL_PINGS=10
 
@@ -445,27 +445,29 @@ END>GET_LOCAL_IP
 
 /*
 OUI_INFORMATION:
-#######MAC OUI to be able to search ESP units######
-###Found here: http://standards-oui.ieee.org/oui.txt ###
-###Scanning the IP with this: arp -a XXX.XXX.XXX.XXX##
-###RegEx: (?:.){8}(?= {3}\(hex\)\t{2}Espressif Inc\.)##
-#############Espressif Inc. OUI#############
+#########MAC OUI to be able to search ESP units########
+##################UPDATED: 2018-02-12##################
+##Found here: http://standards-oui.ieee.org/oui.txt ###
+##RegEx: (?:.){8}(?= {3}\(hex\)\t{2}Espressif Inc\.) ##
+##################Espressif Inc. OUI###################
 001: 54-5A-A6
 002: 24-0A-C4
 003: D8-A0-1D
 004: EC-FA-BC
 005: B4-E6-2D
 006: A0-20-A6
-007: 90-97-D5
-008: 18-FE-34
-009: 60-01-94
-010: 2C-3A-E8
-011: A4-7B-9D
-012: DC-4F-22
-013: BC-DD-C2
-014: 5C-CF-7F
-015: AC-D0-74
-016: 30-AE-A4
-017: 24-B2-DE
-018: 68-C6-3A
+007: 84-F3-EB
+008: 84-0D-8E
+009: 90-97-D5
+010: 18-FE-34
+011: 60-01-94
+012: 2C-3A-E8
+013: A4-7B-9D
+014: DC-4F-22
+015: BC-DD-C2
+016: 5C-CF-7F
+017: AC-D0-74
+018: 30-AE-A4
+019: 24-B2-DE
+020: 68-C6-3A
 */
