@@ -5,11 +5,10 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.017
+Let>VERSION=0.00.018
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 Let>MAX_PARALLEL_PINGS=10
 //Below are for the popup menu
-Timer>LAST_TIME
 Let>SHOW_POPUP_MENU=0
 
 //Start of program
@@ -378,6 +377,7 @@ SRT>FETCH_INFO_ABOUT_UNITS
         Let>UNIT_NUMBER_%k_csv%=?
         Let>UNIT_NAME_%k_csv%=?
         Let>UNIT_ONLINE_%k_csv%="<unknown>"
+        Let>UPTIME_%k_csv%=?
       Else>
         JSONParse>JSON_STRING,System.Build,TEMP_STRING
         If>TEMP_STRING=
@@ -400,6 +400,11 @@ SRT>FETCH_INFO_ABOUT_UNITS
         Endif>
         Let>GIT_BUILD_NUMBER_%k_csv%=TEMP_STRING
         Let>UNIT_ONLINE_%k_csv%="Online"
+        JSONParse>JSON_STRING,System.Uptime,TEMP_STRING
+        If>TEMP_STRING=
+          Let>TEMP_STRING=?
+        Endif>
+        Let>UPTIME_%k_csv%=TEMP_STRING
       Endif>
       If>TIME_DIFF>5000
         Let>UNIT_ONLINE_%k_csv%="Timed out"
@@ -409,7 +414,8 @@ SRT>FETCH_INFO_ABOUT_UNITS
       Let>TEMP_BUILD=BUILD_NUMBER_%k_csv%
       Let>TEMP_GIT=GIT_BUILD_NUMBER_%k_csv%
       Let>TEMP_ONLINE=UNIT_ONLINE_%k_csv%
-      Let>TEMP_ROW_INFO_%k_csv%=,%TEMP_NAME%,%TEMP_NUMBER%,%TEMP_BUILD%,%TEMP_GIT%,%TEMP_ONLINE%
+      Let>TEMP_UPTIME=UPTIME_%k_csv%
+      Let>TEMP_ROW_INFO_%k_csv%=,%TEMP_NAME%,%TEMP_NUMBER%,%TEMP_BUILD%,%TEMP_GIT%,%TEMP_ONLINE%,%TEMP_UPTIME%
     Until>k_csv=TOTAL_COUNT
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
     SetDialogProperty>Dialog_MAIN,ProgressBar,Position,0
@@ -476,7 +482,7 @@ SRT>CONCAT_THE_MAC
 END>CONCAT_THE_MAC
 
 SRT>THE_CSV_TO_THE_DIALOG
-  Let>THE_GRID_CSV="IP","Name","Number","Version","Git version","Status"
+  Let>THE_GRID_CSV="IP","Name","Number","Version","Git version","Status","Uptime [min]"
   Let>REGEX_PATTERN=,
   RegEx>REGEX_PATTERN,THE_GRID_CSV,0,,NUMBER_OF_COLUMNS,0,,
   Let>NUMBER_OF_COLUMNS=NUMBER_OF_COLUMNS+1
