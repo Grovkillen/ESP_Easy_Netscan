@@ -1,13 +1,16 @@
-// COMPILE_OPTS|C:\Users\Jimmy\Desktop\ESP_Easy_Netscan.exe|C:\Users\Jimmy\Dropbox\Diverse\ESP-projekt\ESP_Easy_Netscan\ICON.ico|CONSOLE=0|INCLUDES=1| /NOSYSTRAY|RUNTIMES=1|BMPS=1
+// COMPILE_OPTS|C:\Users\Jimwes\Desktop\ESP_Easy_Netscan.exe|C:\Users\Jimwes\Dropbox\Diverse\ESP-projekt\ESP_Easy_Netscan\ICON.ico|CONSOLE=0|INCLUDES=1| /NOSYSTRAY|RUNTIMES=1|BMPS=1
 //Set IGNORESPACES to 1 to force script interpreter to ignore spaces.
 //If using IGNORESPACES quote strings in {" ... "}
 //Let>IGNORESPACES=1
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.016
+Let>VERSION=0.00.017
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 Let>MAX_PARALLEL_PINGS=10
+//Below are for the popup menu
+Timer>LAST_TIME
+Let>SHOW_POPUP_MENU=0
 
 //Start of program
 GoSub>DIALOG_MAIN
@@ -19,6 +22,7 @@ GoSub>DO_A_SCAN,0,0,0
 Show>Dialog_MAIN
 Wait>%TIME_TO_DISPLAY_MESSAGE%
 SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
+Let>SHOW_POPUP_MENU=1
 
 //Loop to let dialog_MAIN stay alive and listen to interactions from user
 Label>WAITING_FOR_A_WHILE
@@ -172,47 +176,62 @@ SRT>ADD_DIALOG_HANDLERS
   SetDialogProperty>Dialog_MAIN,LIST_IP_ADDRESSES,ListText,%LIST_IP_ADDRESSES_FOUND%
   SetDialogProperty>Dialog_MAIN,LIST_IP_ADDRESSES,Text,%ACTIVE_IP_ADDRESS%
   AddDialogHandler>Dialog_MAIN,,OnClose,EXIT_APP
+  AddDialogHandler>Dialog_MAIN,THE_GRID,OnSelectCell,CLICK_ROW_GET_INFO
+  AddDialogHandler>Dialog_MAIN,THE_GRID,OnDblClick,OPEN_MENU
   AddDialogHandler>Dialog_MAIN,Button_Deep_Scan,OnClick,DO_A_SCAN(1,1,1)
   AddDialogHandler>Dialog_MAIN,Button_Scan,OnClick,DO_A_SCAN(0,0,1)
 END>ADD_DIALOG_HANDLERS
 
 SRT>DO_A_SCAN
   GetDialogProperty>Dialog_MAIN,LIST_IP_ADDRESSES,Text,ACTIVE_IP_ADDRESS
-  GoSub>GET_THE_IP_OCTETS
-  SetDialogProperty>Dialog_MAIN,Button_Deep_Scan,Enabled,False
-  SetDialogProperty>Dialog_MAIN,Button_Scan,Enabled,False
-  SetDialogProperty>Dialog_MAIN,LIST_IP_ADDRESSES,Enabled,False
-  Let>SUM_OF_ALL_INPUTS={%DO_A_SCAN_Var_1%+%DO_A_SCAN_Var_2%+%DO_A_SCAN_Var_3%}
-  Let>DEEP_SCAN=DO_A_SCAN_Var_1
-  Let>PING_SCAN=DO_A_SCAN_Var_2
-  Let>INFO_SCAN=DO_A_SCAN_Var_3
-  If>PING_SCAN>0
-    GoSub>PING_ESPRESSIF_IPS
-  Endif>
-  If>DEEP_SCAN>0
-    GoSub>PING_THE_NETWORK
-    Let>SUM_OF_ALL_INPUTS=0
-    Let>INFO_SCAN=1
-  Endif>
-  If>SUM_OF_ALL_INPUTS=0
-    GoSub>GET_THE_MAC
-  Endif>
-  If>INFO_SCAN>0
-    GoSub>FETCH_INFO_ABOUT_UNITS
-  Endif>
-  GoSub>THE_CSV_TO_THE_DIALOG
-  SetDialogProperty>Dialog_MAIN,THE_GRID,LoadFromCSV,THE_GRID_CSV
-  SetDialogProperty>Dialog_MAIN,Button_Deep_Scan,Enabled,True
-  SetDialogProperty>Dialog_MAIN,Button_Scan,Enabled,True
-  SetDialogProperty>Dialog_MAIN,LIST_IP_ADDRESSES,Enabled,True
-  RegEx>[IPAddress],THE_GRID_CSV,1,,FOUND_IN_ARP,,,
-  If>FOUND_IN_ARP>0
-    //YES, we found something
+  RegEx>[IPAddress],ACTIVE_IP_ADDRESS,1,,FOUND_IP_count,,,
+  If>FOUND_IP_count>0
+    GoSub>GET_THE_IP_OCTETS
+    SetDialogProperty>Dialog_MAIN,Button_Deep_Scan,Enabled,False
+    SetDialogProperty>Dialog_MAIN,Button_Scan,Enabled,False
+    SetDialogProperty>Dialog_MAIN,LIST_IP_ADDRESSES,Enabled,False
+    Let>SUM_OF_ALL_INPUTS={%DO_A_SCAN_Var_1%+%DO_A_SCAN_Var_2%+%DO_A_SCAN_Var_3%}
+    Let>DEEP_SCAN=DO_A_SCAN_Var_1
+    Let>PING_SCAN=DO_A_SCAN_Var_2
+    Let>INFO_SCAN=DO_A_SCAN_Var_3
+    If>PING_SCAN>0
+      GoSub>PING_ESPRESSIF_IPS
+    Endif>
+    If>DEEP_SCAN>0
+      GoSub>PING_THE_NETWORK
+      Let>SUM_OF_ALL_INPUTS=0
+      Let>INFO_SCAN=1
+    Endif>
+    If>SUM_OF_ALL_INPUTS=0
+      GoSub>GET_THE_MAC
+    Endif>
+    If>INFO_SCAN>0
+      GoSub>FETCH_INFO_ABOUT_UNITS
+    Endif>
+    GoSub>THE_CSV_TO_THE_DIALOG
+    SetDialogProperty>Dialog_MAIN,THE_GRID,LoadFromCSV,THE_GRID_CSV
+    SetDialogProperty>Dialog_MAIN,Button_Deep_Scan,Enabled,True
+    SetDialogProperty>Dialog_MAIN,Button_Scan,Enabled,True
+    SetDialogProperty>Dialog_MAIN,LIST_IP_ADDRESSES,Enabled,True
+    RegEx>[IPAddress],THE_GRID_CSV,1,,FOUND_IN_ARP,,,
+    If>FOUND_IN_ARP>0
+      //YES, we found something
+    Else>
+      Let>EXTRA_TEXT=, please run "Deep scan"
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,No ESP Easy units found in ARP table%EXTRA_TEXT%.
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
+      Let>TIME_TO_DISPLAY_MESSAGE=5
+    Endif>
   Else>
-    Let>EXTRA_TEXT=, please run "Deep scan"
-    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,No ESP Easy units found in ARP table%EXTRA_TEXT%.
-    SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
-    Let>TIME_TO_DISPLAY_MESSAGE=5
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,Not a valid IP address entered!
+      Let>k_blink=0
+      Repeat>k_blink
+        Let>k_blink=k_blink+1
+        SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
+        Wait>0.5
+        SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
+        Wait>0.5
+      Until>k_blink=5
   Endif>
 END>DO_A_SCAN
 
@@ -265,6 +284,64 @@ SRT>PING_THE_NETWORK
     SetDialogProperty>Dialog_MAIN,ProgressBar,Position,0
 END>PING_THE_NETWORK
 
+SRT>CLICK_ROW_GET_INFO
+  Let>MARKED_IP_ADDRESS_FROM_ROW=FOUND_ESPRESSIF_UNITS_IP_ARRAY_%CLICK_ROW_GET_INFO_AROW%
+END>CLICK_ROW_GET_INFO
+
+SRT>OPEN_MENU
+  If>SHOW_POPUP_MENU>0
+    Wait>0.2
+    GetCursorPos>MOUSE_X,MOUSE_Y,
+    //0
+    Let>POPUP_MENU_LIST=Open %MARKED_IP_ADDRESS_FROM_ROW% in browser
+    //1
+    ConCat>POPUP_MENU_LIST,;Download config.dat
+    //2
+    //ConCat>POPUP_MENU_LIST,;Upload config.dat
+    PopupMenu>MOUSE_X,MOUSE_Y,%POPUP_MENU_LIST%,OPTION_PICKED
+    If>OPTION_PICKED<0
+      //Nothing picked
+    Else>
+      //Something picked
+    Endif>
+    If>OPTION_PICKED=0
+      GoSub>OPEN_BROWSER
+    Endif>
+    If>OPTION_PICKED=1
+      GoSub>DOWNLOAD_CONFIG_DAT
+    Endif>
+  Endif>
+END>OPEN_MENU
+
+SRT>OPEN_BROWSER
+  Run>explorer "http://%MARKED_IP_ADDRESS_FROM_ROW%"
+END>OPEN_BROWSER
+
+SRT>DOWNLOAD_CONFIG_DAT
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,Config.dat downloadinge from %MARKED_IP_ADDRESS_FROM_ROW%...
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
+    HTTPRequest>http://%MARKED_IP_ADDRESS_FROM_ROW%/config.dat,%SCRIPT_DIR%\%MARKED_IP_ADDRESS_FROM_ROW%_Config.dat,GET,,IE_ERROR
+    Let>ERROR_OUTPUT=0
+    If>IE_ERROR=404 Error connecting to host
+      Let>ERROR_OUTPUT=1
+    Endif>
+    If>IE_ERROR=404 HTTP/1.1 404 Not Found
+      Let>ERROR_OUTPUT=1
+    Endif>
+    If>ERROR_OUTPUT>0
+      //Write something...
+    Endif>
+      GetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,CURRENT_TEXT
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,%CURRENT_TEXT%DONE!
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
+      SetDialogProperty>Dialog_MAIN,ProgressBar,Position,100
+      Wait>5
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
+      SetDialogProperty>Dialog_MAIN,ProgressBar,Position,0
+END>DOWNLOAD_CONFIG_DAT
+
 SRT>PING_ESPRESSIF_IPS
 
 END>PING_ESPRESSIF_IPS
@@ -292,13 +369,15 @@ SRT>FETCH_INFO_ABOUT_UNITS
       HTTPRequest>http://%CURRENT_IP%/json,,GET,,JSON_STRING,,,,
       Timer>TIMER2
       Let>TIME_DIFF=TIMER2-TIMER1
+      //Need to fix parsing error due to space...?
+      RegEx>Git Build,JSON_STRING,,,,1,Git_Build,JSON_STRING
       If>JSON_STRING=404 HTTP/1.1 404 Not Found
         //
         Let>BUILD_NUMBER_%k_csv%=?
         Let>GIT_BUILD_NUMBER_%k_csv%=?
         Let>UNIT_NUMBER_%k_csv%=?
         Let>UNIT_NAME_%k_csv%=?
-        Let>UNIT_ONLINE_%k_csv%="Offline"
+        Let>UNIT_ONLINE_%k_csv%="<unknown>"
       Else>
         JSONParse>JSON_STRING,System.Build,TEMP_STRING
         If>TEMP_STRING=
@@ -315,7 +394,7 @@ SRT>FETCH_INFO_ABOUT_UNITS
           Let>TEMP_STRING=?
         Endif>
         Let>UNIT_NAME_%k_csv%=TEMP_STRING
-        JSONParse>JSON_STRING,System.Git Build,TEMP_STRING
+        JSONParse>JSON_STRING,System.Git_Build,TEMP_STRING
         If>TEMP_STRING=
           Let>TEMP_STRING=?
         Endif>
@@ -361,10 +440,10 @@ SRT>GET_THE_MAC
       Separate>TEMP_CHECK,%CRLF%,TEMP_CHECK_ARRAY
       Let>CURRENT_IP_NUMBER=TEMP_CHECK_ARRAY_1
       Trim>CURRENT_IP_NUMBER,CURRENT_IP_NUMBER
-      Let>CURENT_MAC_ADDRES=TEMP_CHECK_ARRAY_%TEMP_CHECK_ARRAY_count%
-      Trim>CURENT_MAC_ADDRES,CURENT_MAC_ADDRES
-      UpperCase>CURENT_MAC_ADDRES,CURENT_MAC_ADDRES
-      RegEx>REGEX_PATTERN_MAC,CURENT_MAC_ADDRES,0,,IS_IT_FOUND,,,
+      Let>CURRENT_MAC_ADDRESS=TEMP_CHECK_ARRAY_%TEMP_CHECK_ARRAY_count%
+      Trim>CURRENT_MAC_ADDRESS,CURRENT_MAC_ADDRESS
+      UpperCase>CURRENT_MAC_ADDRESS,CURRENT_MAC_ADDRESS
+      RegEx>REGEX_PATTERN_MAC,CURRENT_MAC_ADDRESS,0,,IS_IT_FOUND,,,
       If>IS_IT_FOUND>0
         Let>FOUND_ESPRESSIF_UNITS=%FOUND_ESPRESSIF_UNITS%%CURRENT_IP_NUMBER%%CRLF%
       Endif>
@@ -376,6 +455,8 @@ END>GET_THE_MAC
 
 SRT>CONCAT_THE_MAC
     LabelToVar>OUI_INFORMATION,MAC_ADDRESSES,1,1,
+    LabelToVar>MANUAL_OUI,TEMP,1,1,
+    ConCat>MAC_ADDRESSES,TEMP
     Let>REGEX_PATTERN=(?<=[0123456789]{3}: ).{2}-.{2}-.{2}
     RegEx>REGEX_PATTERN,MAC_ADDRESSES,,MAC_ADDRESSES_ARRAY,MAC_ADDRESSES_ARRAY_num,,,
     If>MAC_ADDRESSES_ARRAY_num>0
@@ -486,4 +567,9 @@ OUI_INFORMATION:
 018: 30-AE-A4
 019: 24-B2-DE
 020: 68-C6-3A
+*/
+
+/*
+MANUAL_OUI:
+001: 38-2B-78
 */
