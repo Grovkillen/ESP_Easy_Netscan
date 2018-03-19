@@ -5,9 +5,10 @@
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.018
+Let>VERSION=0.00.019
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 Let>MAX_PARALLEL_PINGS=10
+Let>HTTP_TIMEOUT=5
 //Below are for the popup menu
 Let>SHOW_POPUP_MENU=0
 
@@ -33,31 +34,31 @@ Goto>WAITING_FOR_A_WHILE
 SRT>DIALOG_MAIN
 Dialog>Dialog_MAIN
 object Dialog_MAIN: TForm
-  Left = 247
-  Top = 97
+  Left = -1398
+  Top = 172
   HelpContext = 5000
   BorderIcons = [biSystemMenu]
   BorderStyle = bsSingle
   Caption = 'ESP Easy node scanner'
-  ClientHeight = 670
-  ClientWidth = 964
+  ClientHeight = 825
+  ClientWidth = 1186
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
-  Font.Height = -11
+  Font.Height = -14
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = True
   Position = poDefault
   ShowHint = True
   OnTaskBar = False
-  PixelsPerInch = 96
-  TextHeight = 13
+  PixelsPerInch = 120
+  TextHeight = 16
   object MAIN_PANEL: TPanel
     Left = 0
     Top = 0
-    Width = 964
-    Height = 670
+    Width = 1186
+    Height = 825
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
@@ -66,24 +67,44 @@ object Dialog_MAIN: TForm
     Caption = 'MAIN_PANEL'
     TabOrder = 0
     object Panel1: TPanel
-      Left = 10
-      Top = 10
-      Width = 944
-      Height = 540
+      Left = 12
+      Top = 12
+      Width = 1162
+      Height = 665
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       TabOrder = 0
       object THE_GRID: tMSStringGrid
         Left = 1
         Top = 1
-        Width = 942
-        Height = 538
+        Width = 1160
+        Height = 663
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Align = alClient
+        ColCount = 9
         DefaultColWidth = 150
-        DefaultRowHeight = 30
+        ColWidths = (
+                    130
+                    220
+                    70
+                    100
+                    170
+                    100
+                    130
+                    150
+                    70)
+        DefaultRowHeight = 35
         FixedCols = 0
         RowCount = 2
+        FixedRows = 0
         Font.Charset = ANSI_CHARSET
         Font.Color = clBlack
-        Font.Height = -21
+        Font.Height = -27
         Font.Name = 'Agency FB'
         Font.Style = []
         Options = [goHorzLine, goRowSizing, goColSizing, goRowSelect]
@@ -92,61 +113,89 @@ object Dialog_MAIN: TForm
       end
     end
     object Panel2: TPanel
-      Left = 10
-      Top = 560
-      Width = 944
-      Height = 100
+      Left = 12
+      Top = 689
+      Width = 1162
+      Height = 123
+      Margins.Left = 4
+      Margins.Top = 4
+      Margins.Right = 4
+      Margins.Bottom = 4
       TabOrder = 1
       object STATUS_INFO_BAR: TLabel
-        Left = 8
-        Top = 56
-        Width = 102
-        Height = 13
+        Left = 10
+        Top = 69
+        Width = 128
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = 'STATUS_INFO_BAR'
       end
       object LOCAL_IP: TLabel
-        Left = 172
-        Top = 12
-        Width = 42
-        Height = 13
+        Left = 212
+        Top = 15
+        Width = 51
+        Height = 16
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = 'Local IP:'
       end
       object Button_Scan: tMSButton
-        Left = 8
-        Top = 6
-        Width = 75
-        Height = 25
+        Left = 10
+        Top = 7
+        Width = 92
+        Height = 31
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = 'Fetch info'
         TabOrder = 0
         DoBrowse = False
         BrowseStyle = fbOpen
       end
       object Button_Deep_Scan: tMSButton
-        Left = 88
-        Top = 6
-        Width = 75
-        Height = 25
+        Left = 108
+        Top = 7
+        Width = 93
+        Height = 31
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Caption = 'Deep scan'
         TabOrder = 1
         DoBrowse = False
         BrowseStyle = fbOpen
       end
       object ProgressBar: TProgressBar
-        Left = 6
-        Top = 74
-        Width = 931
-        Height = 17
+        Left = 7
+        Top = 91
+        Width = 1146
+        Height = 21
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Position = 33
         TabOrder = 2
       end
       object LIST_IP_ADDRESSES: tMSComboBox
-        Left = 218
-        Top = 6
-        Width = 145
-        Height = 24
+        Left = 268
+        Top = 7
+        Width = 179
+        Height = 28
+        Margins.Left = 4
+        Margins.Top = 4
+        Margins.Right = 4
+        Margins.Bottom = 4
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
-        Font.Height = -13
+        Font.Height = -17
         Font.Name = 'MS Sans Serif'
         Font.Style = []
         ParentFont = False
@@ -194,7 +243,8 @@ SRT>DO_A_SCAN
     Let>PING_SCAN=DO_A_SCAN_Var_2
     Let>INFO_SCAN=DO_A_SCAN_Var_3
     If>PING_SCAN>0
-      GoSub>PING_ESPRESSIF_IPS
+      //Not used...
+      //GoSub>
     Endif>
     If>DEEP_SCAN>0
       GoSub>PING_THE_NETWORK
@@ -285,6 +335,13 @@ END>PING_THE_NETWORK
 
 SRT>CLICK_ROW_GET_INFO
   Let>MARKED_IP_ADDRESS_FROM_ROW=FOUND_ESPRESSIF_UNITS_IP_ARRAY_%CLICK_ROW_GET_INFO_AROW%
+  Assigned>UNIT_NAME_%CLICK_ROW_GET_INFO_AROW%,IS_IT_ASSIGNED
+  If>IS_IT_ASSIGNED=TRUE
+    Let>MARKED_UNIT_NAME_FROM_ROW=UNIT_NAME_%CLICK_ROW_GET_INFO_AROW%
+    Let>MARKED_UNIT_NAME_FROM_ROW=%MARKED_UNIT_NAME_FROM_ROW%_
+  Else>
+    Let>MARKED_UNIT_NAME_FROM_ROW=
+  Endif>
 END>CLICK_ROW_GET_INFO
 
 SRT>OPEN_MENU
@@ -294,9 +351,9 @@ SRT>OPEN_MENU
     //0
     Let>POPUP_MENU_LIST=Open %MARKED_IP_ADDRESS_FROM_ROW% in browser
     //1
-    ConCat>POPUP_MENU_LIST,;Download config.dat
+    ConCat>POPUP_MENU_LIST,;Ping %MARKED_IP_ADDRESS_FROM_ROW% in cmd
     //2
-    //ConCat>POPUP_MENU_LIST,;Upload config.dat
+    ConCat>POPUP_MENU_LIST,;Download config.dat
     PopupMenu>MOUSE_X,MOUSE_Y,%POPUP_MENU_LIST%,OPTION_PICKED
     If>OPTION_PICKED<0
       //Nothing picked
@@ -307,6 +364,9 @@ SRT>OPEN_MENU
       GoSub>OPEN_BROWSER
     Endif>
     If>OPTION_PICKED=1
+      GoSub>PING_ESPRESSIF_IPS
+    Endif>
+    If>OPTION_PICKED=2
       GoSub>DOWNLOAD_CONFIG_DAT
     Endif>
   Endif>
@@ -320,7 +380,10 @@ SRT>DOWNLOAD_CONFIG_DAT
       SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
       SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,Config.dat downloadinge from %MARKED_IP_ADDRESS_FROM_ROW%...
       SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
-    HTTPRequest>http://%MARKED_IP_ADDRESS_FROM_ROW%/config.dat,%SCRIPT_DIR%\%MARKED_IP_ADDRESS_FROM_ROW%_Config.dat,GET,,IE_ERROR
+      Timer>TIMER1
+      HTTPRequest>http://%MARKED_IP_ADDRESS_FROM_ROW%/config.dat,%SCRIPT_DIR%\%MARKED_UNIT_NAME_FROM_ROW%%MARKED_IP_ADDRESS_FROM_ROW%_Config.dat,GET,,IE_ERROR,,,,
+      Timer>TIMER2
+      Let>TIME_DIFF=TIMER2-TIMER1
     Let>ERROR_OUTPUT=0
     If>IE_ERROR=404 Error connecting to host
       Let>ERROR_OUTPUT=1
@@ -328,11 +391,18 @@ SRT>DOWNLOAD_CONFIG_DAT
     If>IE_ERROR=404 HTTP/1.1 404 Not Found
       Let>ERROR_OUTPUT=1
     Endif>
-    If>ERROR_OUTPUT>0
-      //Write something...
+    IfFileExists>%SCRIPT_DIR%\%MARKED_UNIT_NAME_FROM_ROW%%MARKED_IP_ADDRESS_FROM_ROW%_Config.dat
+      Let>ERROR_OUTPUT=0
+    Else>
+      Let>ERROR_OUTPUT=1
     Endif>
+    If>ERROR_OUTPUT>0
+      GetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,CURRENT_TEXT
+      SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,%CURRENT_TEXT%TIMED OUT!
+    Else>
       GetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,CURRENT_TEXT
       SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,%CURRENT_TEXT%DONE!
+    Endif>
       SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,True
       SetDialogProperty>Dialog_MAIN,ProgressBar,Position,100
       Wait>5
@@ -342,7 +412,9 @@ SRT>DOWNLOAD_CONFIG_DAT
 END>DOWNLOAD_CONFIG_DAT
 
 SRT>PING_ESPRESSIF_IPS
-
+  Let>RP_WINDOWMODE=1
+  RunProgram>ping -n 10 %MARKED_IP_ADDRESS_FROM_ROW%
+  Let>RP_WINDOWMODE=0
 END>PING_ESPRESSIF_IPS
 
 SRT>FETCH_INFO_ABOUT_UNITS
@@ -363,13 +435,10 @@ SRT>FETCH_INFO_ABOUT_UNITS
       Let>PROGRESS_POSITION={round(100*%k_csv%/%TOTAL_COUNT%)}
       SetDialogProperty>Dialog_MAIN,ProgressBar,Position,%PROGRESS_POSITION%
       SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Caption,Getting info from %CURRENT_IP% (%k_csv%/%TOTAL_COUNT%)
-      Let>HTTP_TIMEOUT=5
       Timer>TIMER1
       HTTPRequest>http://%CURRENT_IP%/json,,GET,,JSON_STRING,,,,
       Timer>TIMER2
       Let>TIME_DIFF=TIMER2-TIMER1
-      //Need to fix parsing error due to space...?
-      RegEx>Git Build,JSON_STRING,,,,1,Git_Build,JSON_STRING
       If>JSON_STRING=404 HTTP/1.1 404 Not Found
         //
         Let>BUILD_NUMBER_%k_csv%=?
@@ -394,7 +463,7 @@ SRT>FETCH_INFO_ABOUT_UNITS
           Let>TEMP_STRING=?
         Endif>
         Let>UNIT_NAME_%k_csv%=TEMP_STRING
-        JSONParse>JSON_STRING,System.Git_Build,TEMP_STRING
+        JSONParse>JSON_STRING,System.Git Build,TEMP_STRING
         If>TEMP_STRING=
           Let>TEMP_STRING=?
         Endif>
@@ -405,6 +474,22 @@ SRT>FETCH_INFO_ABOUT_UNITS
           Let>TEMP_STRING=?
         Endif>
         Let>UPTIME_%k_csv%=TEMP_STRING
+        //Wifi
+        JSONParse>JSON_STRING,WiFi.BSSID,TEMP_STRING
+        If>TEMP_STRING=
+          Let>TEMP_STRING=?
+        Else>
+          GoSub>GET_AP_VERBOSE
+          IfNot>TEMP_VERBOSE_AP=
+            Let>TEMP_STRING=TEMP_VERBOSE_AP
+          Endif>
+        Endif>
+        Let>BSSID_%k_csv%=TEMP_STRING
+        JSONParse>JSON_STRING,WiFi.RSSI,TEMP_STRING
+        If>TEMP_STRING=
+          Let>TEMP_STRING=?
+        Endif>
+        Let>RSSI_%k_csv%=TEMP_STRING
       Endif>
       If>TIME_DIFF>5000
         Let>UNIT_ONLINE_%k_csv%="Timed out"
@@ -415,12 +500,30 @@ SRT>FETCH_INFO_ABOUT_UNITS
       Let>TEMP_GIT=GIT_BUILD_NUMBER_%k_csv%
       Let>TEMP_ONLINE=UNIT_ONLINE_%k_csv%
       Let>TEMP_UPTIME=UPTIME_%k_csv%
-      Let>TEMP_ROW_INFO_%k_csv%=,%TEMP_NAME%,%TEMP_NUMBER%,%TEMP_BUILD%,%TEMP_GIT%,%TEMP_ONLINE%,%TEMP_UPTIME%
+      Let>TEMP_BSSID=BSSID_%k_csv%
+      Let>TEMP_RSSI=RSSI_%k_csv%
+      Let>TEMP_ROW_INFO_%k_csv%=,%TEMP_NAME%,%TEMP_NUMBER%,%TEMP_BUILD%,%TEMP_GIT%,%TEMP_ONLINE%,%TEMP_UPTIME%,%TEMP_BSSID%,%TEMP_RSSI%
     Until>k_csv=TOTAL_COUNT
     SetDialogProperty>Dialog_MAIN,STATUS_INFO_BAR,Visible,False
     SetDialogProperty>Dialog_MAIN,ProgressBar,Position,0
   Endif>
 END>FETCH_INFO_ABOUT_UNITS
+
+SRT>GET_AP_VERBOSE
+  IfFileExists>%SCRIPT_DIR%\Settings\AP.ini
+    ReadIniFile>%SCRIPT_DIR%\Settings\AP.ini,AP,%TEMP_STRING%,TEMP_VERBOSE_AP
+    If>TEMP_VERBOSE_AP=
+      EditIniFile>%SCRIPT_DIR%\Settings\AP.ini,AP,%TEMP_STRING%,
+    Endif>
+  Else>
+    IfNotDirExists>%SCRIPT_DIR%\Settings
+      CreateDir>%SCRIPT_DIR%\Settings
+    Endif>
+    WriteLn>%SCRIPT_DIR%\Settings\AP.ini,,######VERBOSE AP######
+    EditIniFile>%SCRIPT_DIR%\Settings\AP.ini,AP,%TEMP_STRING%,
+    Let>TEMP_VERBOSE_AP=
+  Endif>
+END>GET_AP_VERBOSE
 
 SRT>GET_THE_MAC
   IfFileExists>%SCRIPT_DIR%\APP_DATA\ARP_INFO.txt
@@ -482,7 +585,7 @@ SRT>CONCAT_THE_MAC
 END>CONCAT_THE_MAC
 
 SRT>THE_CSV_TO_THE_DIALOG
-  Let>THE_GRID_CSV="IP","Name","Number","Version","Git version","Status","Uptime [min]"
+  Let>THE_GRID_CSV="IP","Name","Number","Version","Git version","Status","Uptime [min]","AP","Signal"
   Let>REGEX_PATTERN=,
   RegEx>REGEX_PATTERN,THE_GRID_CSV,0,,NUMBER_OF_COLUMNS,0,,
   Let>NUMBER_OF_COLUMNS=NUMBER_OF_COLUMNS+1
@@ -549,7 +652,7 @@ END>GET_LOCAL_IP
 /*
 OUI_INFORMATION:
 #########MAC OUI to be able to search ESP units########
-##################UPDATED: 2018-02-12##################
+##################UPDATED: 2018-03-19##################
 ##Found here: http://standards-oui.ieee.org/oui.txt ###
 ##RegEx: (?:.){8}(?= {3}\(hex\)\t{2}Espressif Inc\.) ##
 ##################Espressif Inc. OUI###################
@@ -566,13 +669,14 @@ OUI_INFORMATION:
 011: 60-01-94
 012: 2C-3A-E8
 013: A4-7B-9D
-014: DC-4F-22
-015: BC-DD-C2
+014: BC-DD-C2
+015: DC-4F-22
 016: 5C-CF-7F
 017: AC-D0-74
 018: 30-AE-A4
 019: 24-B2-DE
 020: 68-C6-3A
+021: CC-50-E3
 */
 
 /*
