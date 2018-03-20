@@ -1,11 +1,11 @@
-// COMPILE_OPTS|C:\Users\Jimwes\Desktop\ESP_Easy_Netscan.exe|C:\Users\Jimwes\Dropbox\Diverse\ESP-projekt\ESP_Easy_Netscan\ICON.ico|CONSOLE=0|INCLUDES=1| /NOSYSTRAY|RUNTIMES=1|BMPS=1
+// COMPILE_OPTS|C:\Users\Jimmy\Desktop\ESP_Easy_Netscan.exe|C:\Users\Jimmy\Dropbox\Diverse\ESP-projekt\ESP_Easy_Netscan\ICON.ico|CONSOLE=0|INCLUDES=1| /NOSYSTRAY|RUNTIMES=1|BMPS=1
 //Set IGNORESPACES to 1 to force script interpreter to ignore spaces.
 //If using IGNORESPACES quote strings in {" ... "}
 //Let>IGNORESPACES=1
 Let>DEBUG_LEVEL=0
 
 //Global variables (version is MAYOR.MINOR.MINIMAL)
-Let>VERSION=0.00.019
+Let>VERSION=0.01.000
 Let>APP_TITLE=ESP Easy Netscan (%VERSION%)
 Let>MAX_PARALLEL_PINGS=10
 Let>HTTP_TIMEOUT=5
@@ -89,15 +89,15 @@ object Dialog_MAIN: TForm
         ColCount = 9
         DefaultColWidth = 150
         ColWidths = (
-                    130
-                    220
+                    110
+                    190
+                    60
+                    70
+                    140
                     70
                     100
-                    170
-                    100
-                    130
-                    150
-                    70)
+                    140
+                    58)
         DefaultRowHeight = 35
         FixedCols = 0
         RowCount = 2
@@ -334,13 +334,19 @@ SRT>PING_THE_NETWORK
 END>PING_THE_NETWORK
 
 SRT>CLICK_ROW_GET_INFO
-  Let>MARKED_IP_ADDRESS_FROM_ROW=FOUND_ESPRESSIF_UNITS_IP_ARRAY_%CLICK_ROW_GET_INFO_AROW%
-  Assigned>UNIT_NAME_%CLICK_ROW_GET_INFO_AROW%,IS_IT_ASSIGNED
-  If>IS_IT_ASSIGNED=TRUE
-    Let>MARKED_UNIT_NAME_FROM_ROW=UNIT_NAME_%CLICK_ROW_GET_INFO_AROW%
-    Let>MARKED_UNIT_NAME_FROM_ROW=%MARKED_UNIT_NAME_FROM_ROW%_
+  If>CLICK_ROW_GET_INFO_AROW=
+    //Do nothing
+    Let>SHOW_POPUP_MENU=0
   Else>
-    Let>MARKED_UNIT_NAME_FROM_ROW=
+    Let>MARKED_IP_ADDRESS_FROM_ROW=FOUND_ESPRESSIF_UNITS_IP_ARRAY_%CLICK_ROW_GET_INFO_AROW%
+    Assigned>UNIT_NAME_%CLICK_ROW_GET_INFO_AROW%,IS_IT_ASSIGNED
+    If>IS_IT_ASSIGNED=TRUE
+      Let>MARKED_UNIT_NAME_FROM_ROW=UNIT_NAME_%CLICK_ROW_GET_INFO_AROW%
+      Let>MARKED_UNIT_NAME_FROM_ROW=%MARKED_UNIT_NAME_FROM_ROW%_
+    Else>
+      Let>MARKED_UNIT_NAME_FROM_ROW=
+    Endif>
+    Let>SHOW_POPUP_MENU=1
   Endif>
 END>CLICK_ROW_GET_INFO
 
