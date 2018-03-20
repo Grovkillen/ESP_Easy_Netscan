@@ -15,12 +15,13 @@ FEATURES
 + From menu: ping that unit.
 + From menu: download the config file from that unit. It will be stored in the same folder path as the exe file.
 + Get which AP the unit is connected to, name it yourself using the AP.ini (found in Settings folder).
-- Will embed the font "Agency FB". It is used to fit all the info in the window. For now you may download it [here](http://allfont.net/cache/fonts/agency-fb_0b9596562659a0772f5e24c22cae921b.ttf). 
+- Embed font "Agency FB".
 ```
 
 EXTRA INFORMATION
 ------------
-* **ONLY WINDOWS** is supported (Windows 10, Windows 8.1, Windows 8, Windows 7) 
+* **ONLY WINDOWS** is supported (Windows 10, Windows 8.1, Windows 8, Windows 7)
+* **MISSING FONT**, will embed the font "Agency FB". It is used to fit all the info in the window. For now you may download it [here](http://allfont.net/cache/fonts/agency-fb_0b9596562659a0772f5e24c22cae921b.ttf). 
 
 LEGEND
 ------------
